@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  # Server
+  backend:
+    restart: always
+    build:
+      context: ./backend
+    command: >
+      sh -c "python manage.py runserver 0.0.0.0:9005"
+    volumes:
+      - ./backend:/backend
+    ports:
+      - "9005:9005"
+    env_file:
+      - ./backend/.env
+
+  frontend:
+    restart: unless-stopped
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    command: sh -c "npm install --legacy-peer-deps && npm run dev"
+    volumes:
+      - ./frontend:/frontend
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "3009:3009"
+    depends_on:
+      - backend
